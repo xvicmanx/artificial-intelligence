@@ -24,6 +24,7 @@ class QLearner:
     self.__episodes = episodes
     self.__iterations = iterations
     self.__randomness = randomness
+    self.__policy = None
     
 
   def train(self):
@@ -53,12 +54,15 @@ class QLearner:
         if done:
           break
 
-    return np.argmax(q, axis = len(env.get_states_dimension()))
+      self.__policy = np.argmax(q, axis = len(env.get_states_dimension()))
 
+  def get_action(self, observation):
+    state = self.__environment.get_state(observation)
+    return self.__policy[state]
 
   """Picks the next action based on a probability distribution created
     from the q-values or randomly.
-    The selection would depend on the value of the randomness.
+    The selection would depend on the value of the randomness. (action selection policy: epsilon greedy)
   """
   def __pick_action(self, state):
     q = self.__q_values

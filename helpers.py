@@ -17,15 +17,15 @@ def make_discrete(observation, space, intervals):
 
 def show_result(
   environment,
-  policy,
+  model,
   iterations = 10000,
 ):
-  state = environment.get_initial_state()
+  observation = environment.get_initial_observation()
+
   for i in range(iterations):
     environment.render()
-    action = policy[state]
+    action = model.get_action(observation)
     observation, _, done, _ = environment.apply_action(action)
-    state = environment.get_state(observation)
     
     if done:
       break

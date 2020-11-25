@@ -5,5 +5,7 @@ from helpers import show_result
 
 np.random.seed(0)
 environment = MountainCar()
-learner = QLearner(environment)
-show_result(environment, learner.train())
+model = QLearner(environment)
+model.train()
+
+show_result(environment, model)

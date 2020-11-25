@@ -11,7 +11,10 @@ class MountainCar:
     self.__environment.seed(0)
 
   def get_initial_state(self):
-    return self.get_state(self.__environment.reset())
+    return self.get_state(self.get_initial_observation())
+
+  def get_initial_observation(self):
+    return self.__environment.reset()
 
   def apply_action(self, action):
     return self.__environment.step(action)
