@@ -1,5 +1,6 @@
 import numpy as np
 import gym
+from helpers import make_discrete
 
 class MountainCar:
   intervals = 40
@@ -16,14 +17,10 @@ class MountainCar:
     return self.__environment.step(action)
 
   def get_state(self, observation):
-    space = self.__environment.observation_space
-    lowest_values = space.low
-    highest_values = space.high
-    interval_sizes = (highest_values - lowest_values) / MountainCar.intervals
-    
-    return (
-      int((observation[0] - lowest_values[0]) / interval_sizes[0]),
-      int((observation[1] - lowest_values[1]) / interval_sizes[1]),
+    return make_discrete(
+      observation,
+      self.__environment.observation_space,
+      MountainCar.intervals,
     )
 
   def get_states_dimension(self):

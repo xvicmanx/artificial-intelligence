@@ -1,3 +1,14 @@
+def make_discrete(observation, space, intervals):
+  lv = space.low
+  hv = space.high
+  iz = (hv - lv) / intervals
+    
+  items = []
+  for i in range(len(hv)):
+    items.append(int((observation[i] - lv[i]) / iz[i]))
+
+  return tuple(items)
+
 def show_result(
   environment,
   policy,
