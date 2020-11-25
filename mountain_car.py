@@ -1,12 +1,12 @@
 import numpy as np
 import gym
-# from gym import wrappers
 
 class MountainCar:
   intervals = 40
+  env_name = 'MountainCar-v0'
   
   def __init__(self):
-    self.__environment = gym.make('MountainCar-v0').env
+    self.__environment = gym.make(MountainCar.env_name).env
     self.__environment.seed(0)
 
   def get_initial_state(self):

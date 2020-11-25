@@ -45,11 +45,8 @@ class QLearner:
         action = self.__pick_action(state)
         observation, reward, done, _ = env.apply_action(action)
         new_state = env.get_state(observation)
-        
-        # Update
-        q_observation = reward + df * np.max(q[new_state])
-        q[state][action] = (1 - lr) * q[state][action] + lr * q_observation
-        
+        q_new = reward + df * np.max(q[new_state])
+        q[state][action] = (1 - lr) * q[state][action] + lr * q_new
         state = new_state
 
         if done:
@@ -73,5 +70,5 @@ class QLearner:
     return np.random.choice(actions, p = probs)
 
 
-  # Q(s, a) = (1 - learning_rate) * Q(s, a) + learning_rate * Qobs(s, a)
-    # Q_obs(s, a) = reward(s, a) + discount_factor * max_a' Q(s', a') 
+# Q(s, a) = (1 - learning_rate) * Q(s, a) + learning_rate * Q_new(s, a)
+# Q_new(s, a) = reward(s, a) + discount_factor * max_a' Q(s', a') 

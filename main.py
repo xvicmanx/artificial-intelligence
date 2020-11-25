@@ -1,5 +1,4 @@
 import numpy as np
-
 from mountain_car import MountainCar
 from q_learner import QLearner
 from helpers import show_result
