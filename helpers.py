@@ -1,3 +1,9 @@
+import numpy as np
+
+def softmax(vect):
+  values = np.exp(vect)
+  return values / np.sum(values)
+
 def make_discrete(observation, space, intervals):
   lv = space.low
   hv = space.high

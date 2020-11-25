@@ -1,5 +1,6 @@
 import numpy as np
 import gym
+from helpers import softmax
 
 class QLearner:
   min_learning_rate = 0.001
@@ -54,6 +55,11 @@ class QLearner:
 
     return np.argmax(q, axis = len(env.get_states_dimension()))
 
+
+  """Picks the next action based on a probability distribution created
+    from the q-values or randomly.
+    The selection would depend on the value of the randomness.
+  """
   def __pick_action(self, state):
     q = self.__q_values
     env = self.__environment
@@ -64,10 +70,7 @@ class QLearner:
     if should_pick_random:
       return np.random.choice(actions)
 
-    values = np.exp(q[state])
-    probs = values / np.sum(values)
-  
-    return np.random.choice(actions, p = probs)
+    return np.random.choice(actions, p = softmax(q[state]))
 
 
 # Q(s, a) = (1 - learning_rate) * Q(s, a) + learning_rate * Q_new(s, a)
