@@ -1,5 +1,6 @@
 import numpy as np
 import gym
+import joblib
 from helpers import softmax
 
 class QLearner:
@@ -54,11 +55,30 @@ class QLearner:
         if done:
           break
 
-      self.__policy = np.argmax(q, axis = len(env.get_states_dimension()))
+    self.__policy = self.__get_policy()
 
+  """Gets the best action from the observation using the learned policy
+  """
   def get_action(self, observation):
     state = self.__environment.get_state(observation)
     return self.__policy[state]
+
+  """Save a serialized version of the model to a file
+  """
+  def save(self, file_path):
+    self.__save_object(self.__q_values, file_path)
+
+  """Loads the serialized version of the model from file
+  """
+  def load(self, file_path):
+    self.__q_values = self.__load_object(file_path)
+    self.__policy = self.__get_policy()
+
+  def __save_object(self, obj, filepath):
+    joblib.dump(obj, filepath)
+  
+  def __load_object(self, file_path):
+    return joblib.load(file_path)
 
   """Picks the next action based on a probability distribution created
     from the q-values or randomly.
@@ -76,6 +96,11 @@ class QLearner:
 
     return np.random.choice(actions, p = softmax(q[state]))
 
+  def __get_policy(self):
+    return np.argmax(
+      self.__q_values,
+      axis = len(self.__environment.get_states_dimension()),
+    )
 
 # Q(s, a) = (1 - learning_rate) * Q(s, a) + learning_rate * Q_new(s, a)
 # Q_new(s, a) = reward(s, a) + discount_factor * max_a' Q(s', a') 

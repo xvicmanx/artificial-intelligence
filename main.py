@@ -5,7 +5,11 @@ from helpers import show_result
 
 np.random.seed(0)
 environment = MountainCar()
+
 model = QLearner(environment)
 model.train()
+
+model.save('MountainCarQLearner.sav')
+model.load('MountainCarQLearner.sav')
 
 show_result(environment, model)
