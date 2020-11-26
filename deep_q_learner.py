@@ -14,7 +14,8 @@ class DeepQLearner:
     iterations = 1000,
     randomness = 0.2,
     discount_factor = 0.9,
-    batch_size = 100
+    batch_size = 100,
+    memory_size = 100000,
   ):
     self.__environment = environment
     self.__episodes = episodes
@@ -24,22 +25,11 @@ class DeepQLearner:
     self.__model = None
     self.__memory = None
     self.__batch_size = batch_size
+    self.__memory_size = memory_size
     
   def train(self):
     env = self.__environment
-    actions = env.get_number_of_actions()
-    model = MLPRegressor(
-      random_state = 0,
-      max_iter = 1,
-      warm_start = True,
-    )
-    self.__model = model
-    self.__memory = []
-
-    model.fit(
-      [env.get_initial_observation()],
-      np.random.rand(1, actions),
-    )
+    model = self.__init_model(env)
   
     for e in range(self.__episodes):
       observation = env.get_initial_observation()
@@ -48,18 +38,16 @@ class DeepQLearner:
 
       for i in range(self.__iterations):
         print('Episode ' + str(e + 1), 'Iter ' + str(i + 1))
+
         action = self.__pick_action(observation)
         new_observation, reward, done, _ = env.apply_action(action)
 
-        self.__memory.append((
+        self.__store_in_memory((
           observation,
           new_observation,
           action,
           reward,
         ))
-
-        if len(self.__memory) > 100000:
-          del self.__memory[0]
 
         if len(self.__memory) > self.__batch_size:
           self.__batch_train()
@@ -93,6 +81,29 @@ class DeepQLearner:
   
   def __load_object(self, file_path):
     return joblib.load(file_path)
+
+  def __init_model(self, env):
+    actions = env.get_number_of_actions()
+    model = MLPRegressor(
+      random_state = 0,
+      max_iter = 1,
+      warm_start = True,
+    )
+    self.__model = model
+    self.__memory = []
+
+    model.fit(
+      [env.get_initial_observation()],
+      np.random.rand(1, actions),
+    )
+
+    return model
+
+  def __store_in_memory(sample):
+    self.__memory.append(sample)
+
+    if len(self.__memory) > self.__memory_size:
+      del self.__memory[0]
 
   def __batch_train(self):
     model = self.__model
