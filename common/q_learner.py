@@ -36,10 +36,10 @@ class QLearner(Agent):
     df = self.__discount_factor
     initial_learning_rate = self.__learning_rate
 
+    max_reward = None
     for e in range(self.__episodes):
       state = env.get_initial_state()
-
-      print('Episode ' + str(e + 1))
+      total_reward = 0.0
       
       lr = max(
         QLearner.min_learning_rate,
@@ -54,8 +54,17 @@ class QLearner(Agent):
         q[state][action] = (1 - lr) * q[state][action] + lr * q_new
         state = new_state
 
+        total_reward += reward
+
         if done:
           break
+
+      if max_reward is None:
+        max_reward = total_reward
+      else:
+        max_reward = max(max_reward, total_reward)
+      
+      print('Episode ' + str(e + 1), max_reward, total_reward)
 
     self.__policy = self.__get_policy()
 
