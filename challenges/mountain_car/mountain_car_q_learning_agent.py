@@ -1,9 +1,8 @@
 import os.path
-from environment import MountainCarEnvironment
-from q_learner import QLearner
+from mountain_car_environment import MountainCarEnvironment
+from common.q_learner import QLearner
 
-dirname = os.path.dirname(__file__)
-persisted_models_dirname = 'data'
+persisted_models_dirname = os.path.dirname(__file__) + '/data'
 
 class MountainCarQLearningAgent(QLearner):
   def __init__(self):

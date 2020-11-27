@@ -1,9 +1,7 @@
 import numpy as np
 
-def softmax(vect):
-  values = np.exp(vect)
-  return values / np.sum(values)
-
+"""Make space continuous values discrete
+"""
 def make_discrete(observation, space, intervals):
   lv = space.low
   hv = space.high
@@ -14,6 +12,10 @@ def make_discrete(observation, space, intervals):
     items.append(int((observation[i] - lv[i]) / iz[i]))
 
   return tuple(items)
+
+def softmax(vect):
+  values = np.exp(vect)
+  return values / np.sum(values)
 
 """Picks the next action based on a probability distribution created
   from the values passed or randomly.

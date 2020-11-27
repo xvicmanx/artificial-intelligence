@@ -1,9 +1,8 @@
 import os.path
-from environment import MountainCarEnvironment
+from mountain_car_environment import MountainCarEnvironment
 from deep_q_learner import DeepQLearner
 
-dirname = os.path.dirname(__file__)
-persisted_models_dirname = 'data'
+persisted_models_dirname = os.path.dirname(__file__) + '/data'
 
 class MountainCarDeepQLearningAgent(DeepQLearner):
   def __init__(self):

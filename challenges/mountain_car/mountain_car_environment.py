@@ -1,7 +1,6 @@
 import numpy as np
 import gym
-from helpers import make_discrete
-from helpers import show_result
+from common.helpers import make_discrete
 
 class MountainCarEnvironment:
   intervals = 40
