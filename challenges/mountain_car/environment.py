@@ -1,13 +1,14 @@
 import numpy as np
 import gym
 from helpers import make_discrete
+from helpers import show_result
 
-class MountainCar:
+class MountainCarEnvironment:
   intervals = 40
   env_name = 'MountainCar-v0'
   
   def __init__(self):
-    self.__environment = gym.make(MountainCar.env_name).env
+    self.__environment = gym.make(MountainCarEnvironment.env_name).env
     self.__environment.seed(0)
 
   def get_initial_state(self):
@@ -23,11 +24,14 @@ class MountainCar:
     return make_discrete(
       observation,
       self.__environment.observation_space,
-      MountainCar.intervals,
+      MountainCarEnvironment.intervals,
     )
 
   def get_states_dimension(self):
-    return (MountainCar.intervals, MountainCar.intervals)
+    return (
+      MountainCarEnvironment.intervals,
+      MountainCarEnvironment.intervals,
+    )
 
   def get_number_of_actions(self):
     return self.__environment.action_space.n

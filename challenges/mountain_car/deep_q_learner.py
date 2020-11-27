@@ -1,15 +1,15 @@
 import numpy as np
 import random
-import gym
-import joblib
-from helpers import softmax
+from helpers import pick_action
+from agent import Agent
 
 from sklearn.neural_network import MLPRegressor
 
-class DeepQLearner:
+class DeepQLearner(Agent):
   def __init__(
     self,
     environment,
+    agent_persist_file_path,
     episodes = 700,
     iterations = 200,
     exploration_rate = 1.0,
@@ -20,7 +20,9 @@ class DeepQLearner:
     batch_size = 200,
     memory_size = 20000,
   ):
-    self.__environment = environment
+    super().__init__(environment)
+
+    self.__agent_persist_file_path = agent_persist_file_path
     self.__episodes = episodes
     self.__iterations = iterations
     self.__exploration_rate = exploration_rate
@@ -34,7 +36,7 @@ class DeepQLearner:
     self.__train_interval = train_interval
     
   def train(self):
-    env = self.__environment
+    env = self._environment
     model = self.__init_model(env)
   
     count = 0
@@ -63,7 +65,6 @@ class DeepQLearner:
           self.__batch_train()
         
         observation = new_observation
-
         count += 1
 
         if done:
@@ -86,19 +87,13 @@ class DeepQLearner:
 
   """Save a serialized version of the model to a file
   """
-  def save(self, file_path):
-    self.__save_object(self.__model, file_path)
+  def save(self):
+    self._save_object(self.__model, self.__agent_persist_file_path)
 
   """Loads the serialized version of the model from file
   """
-  def load(self, file_path):
-    self.__model = self.__load_object(file_path)
-
-  def __save_object(self, obj, filepath):
-    joblib.dump(obj, filepath)
-  
-  def __load_object(self, file_path):
-    return joblib.load(file_path)
+  def load(self):
+    self.__model = self._load_object(self.__agent_persist_file_path)
 
   def __init_model(self, env):
     actions = env.get_number_of_actions()
@@ -143,14 +138,9 @@ class DeepQLearner:
     The selection would depend on the value of the exploration_rate. (action selection policy: epsilon greedy)
   """
   def __pick_action(self, observation):
-    env = self.__environment
-    actions = env.get_number_of_actions()
-
-    should_pick_random = np.random.uniform(0, 1) < self.__exploration_rate
-
-    if should_pick_random:
-      return np.random.choice(actions)
-
     q_values = self.__model.predict([observation])
-
-    return np.random.choice(actions, p = softmax(q_values[0]))
+    return pick_action(
+      q_values[0],
+      self._environment.get_number_of_actions(),
+      self.__exploration_rate,
+    )
