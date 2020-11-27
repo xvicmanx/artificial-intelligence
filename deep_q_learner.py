@@ -10,29 +10,37 @@ class DeepQLearner:
   def __init__(
     self,
     environment,
-    episodes = 10,
-    iterations = 1000,
-    randomness = 0.2,
-    discount_factor = 0.9,
-    batch_size = 100,
-    memory_size = 100000,
+    episodes = 700,
+    iterations = 200,
+    exploration_rate = 1.0,
+    min_exploration_rate = 0.02,
+    exploration_rate_decay = 0.99,
+    discount_factor = 0.5,
+    train_interval = 50,
+    batch_size = 200,
+    memory_size = 20000,
   ):
     self.__environment = environment
     self.__episodes = episodes
     self.__iterations = iterations
-    self.__randomness = randomness
+    self.__exploration_rate = exploration_rate
+    self.__min_exploration_rate = min_exploration_rate
+    self.__exploration_rate_decay = exploration_rate_decay
     self.__discount_factor = discount_factor
     self.__model = None
     self.__memory = None
     self.__batch_size = batch_size
     self.__memory_size = memory_size
+    self.__train_interval = train_interval
     
   def train(self):
     env = self.__environment
     model = self.__init_model(env)
   
+    count = 0
     for e in range(self.__episodes):
       observation = env.get_initial_observation()
+      total_reward = 0.0
 
       print('Episode ' + str(e + 1))
 
@@ -41,22 +49,32 @@ class DeepQLearner:
 
         action = self.__pick_action(observation)
         new_observation, reward, done, _ = env.apply_action(action)
-
+        total_reward += reward
+  
         self.__store_in_memory((
           observation,
           new_observation,
           action,
           reward,
+          done,
         ))
 
-        if len(self.__memory) > self.__batch_size:
+        if len(self.__memory) > self.__batch_size and count % self.__train_interval == 0:
           self.__batch_train()
         
         observation = new_observation
 
+        count += 1
+
         if done:
           print('Done', reward)
           break
+
+      print('Episode ' + str(e + 1), 'Total reward', total_reward)
+      self.__exploration_rate = max(
+        self.__min_exploration_rate,
+        self.__exploration_rate * self.__exploration_rate_decay
+      )
 
     return model
 
@@ -88,6 +106,7 @@ class DeepQLearner:
       random_state = 0,
       max_iter = 1,
       warm_start = True,
+      hidden_layer_sizes = (20, 20),
     )
     self.__model = model
     self.__memory = []
@@ -99,7 +118,7 @@ class DeepQLearner:
 
     return model
 
-  def __store_in_memory(sample):
+  def __store_in_memory(self, sample):
     self.__memory.append(sample)
 
     if len(self.__memory) > self.__memory_size:
@@ -110,22 +129,24 @@ class DeepQLearner:
     df = self.__discount_factor
     samples = random.sample(self.__memory, self.__batch_size)
     
-    for sample in samples:
-      observation, new_observation, action, reward = sample
-      target = reward + df * np.max(model.predict([new_observation])[0])
-      outputs = model.predict([observation])
-      outputs[0][action] = target
-      model.fit([observation], outputs)
+    observations, new_observations, actions, rewards, dones = list(zip(*samples))
+    targets = rewards + df * np.max(model.predict(new_observations), axis = 1)
+    outputs = model.predict(observations)
+
+    for i in range(len(actions)):
+      outputs[i][actions[i]] = rewards[i] if dones[i] else targets[i]
+
+    model.partial_fit(observations, outputs)
 
   """Picks the next action based on a probability distribution created
     from the q-values or randomly.
-    The selection would depend on the value of the randomness. (action selection policy: epsilon greedy)
+    The selection would depend on the value of the exploration_rate. (action selection policy: epsilon greedy)
   """
   def __pick_action(self, observation):
     env = self.__environment
     actions = env.get_number_of_actions()
 
-    should_pick_random = np.random.uniform(0, 1) < self.__randomness
+    should_pick_random = np.random.uniform(0, 1) < self.__exploration_rate
 
     if should_pick_random:
       return np.random.choice(actions)

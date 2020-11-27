@@ -8,10 +8,11 @@ np.random.seed(0)
 environment = MountainCar()
 
 model = DeepQLearner(environment)
-model.train()
+# model.train()
 
-model.save('MountainCarDeepQLearner.sav')
-# model.load('MountainCarDeepQLearner.sav')
+# print('Saving model')
+# model.save('MountainCarDeepQLearner.sav')
+model.load('MountainCarDeepQLearner.sav')
 
 
 # model = QLearner(environment)
@@ -20,4 +21,4 @@ model.save('MountainCarDeepQLearner.sav')
 # model.save('MountainCarQLearner.sav')
 # model.load('MountainCarQLearner.sav')
 
-# show_result(environment, model)
+show_result(environment, model)
