@@ -19,8 +19,10 @@ class DeepQLearner(Agent):
     train_interval = 50,
     batch_size = 200,
     memory_size = 20000,
+    random_state = 0,
+    hidden_layer_sizes = (20, 20),
   ):
-    """An agent that learned from the environment using the Deep Q Learning algorithm
+    """An agent that learns from the environment using the Deep Q Learning algorithm
 
     Args:
         environment (Environment): Environment to interacts with
@@ -34,6 +36,8 @@ class DeepQLearner(Agent):
         train_interval (int, optional): Train interval. Every n interactions the model will be trained. Defaults to 50.
         batch_size (int, optional): The size of the batch. Defaults to 200.
         memory_size (int, optional): The size of the memory. Defaults to 20000.
+        random_state (float, optional): Random state. Defaults to 0.
+        hidden_layer_sizes (float, optional): Hidden layer sizes. Defaults to (20, 20).
     """    
     super().__init__(environment)
 
@@ -49,6 +53,8 @@ class DeepQLearner(Agent):
     self.__batch_size = batch_size
     self.__memory_size = memory_size
     self.__train_interval = train_interval
+    self.__random_state = random_state
+    self.__hidden_layer_sizes = hidden_layer_sizes
     
   def train(self):
     """Trains the agent using the deep q learning algorithm
@@ -125,16 +131,16 @@ class DeepQLearner(Agent):
     Returns:
         MLPRegressor: Neural Network model
     """    
-    actions = env.get_number_of_actions()
     model = MLPRegressor(
-      random_state = 0,
+      random_state = self.__random_state,
       max_iter = 1,
       warm_start = True,
-      hidden_layer_sizes = (20, 20),
+      hidden_layer_sizes = self.__hidden_layer_sizes,
     )
     self.__model = model
     self.__memory = []
 
+    actions = env.get_number_of_actions()
     model.fit(
       [env.get_initial_observation()],
       np.random.rand(1, actions),
@@ -180,7 +186,7 @@ class DeepQLearner(Agent):
 
     Returns:
         integer: Picked action
-    """    
+    """
     q_values = self.__model.predict([observation])
     return pick_action(
       q_values[0],

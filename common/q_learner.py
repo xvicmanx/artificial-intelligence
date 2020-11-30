@@ -15,6 +15,17 @@ class QLearner(Agent):
     iterations = 10000,
     exploration_rate = 0.02
   ):
+    """An agent that learns from the environment using the Deep Q Learning algorithm
+
+    Args:
+        environment (Environment): Environment to interacts with
+        agent_persist_file_path (string): Path to persist the learned model
+        learning_rate (float, optional): Learning rate. Defaults to 1.0.
+        discount_factor (float, optional): Discount factor. Defaults to 0.5.
+        episodes (int, optional): Number of episodes to run. Defaults to 100.
+        iterations (int, optional): Maximum number of iterations per episode. Defaults to 10000.
+        exploration_rate (float, optional): Exploration rate. Defaults to 0.02.
+    """    
     super().__init__(environment)
 
     states = environment.get_states_dimension()
@@ -31,6 +42,8 @@ class QLearner(Agent):
     
 
   def train(self):
+    """Trains the agent using the q learning algorithm
+    """
     q = self.__q_values
     env = self._environment
     df = self.__discount_factor
@@ -68,24 +81,40 @@ class QLearner(Agent):
 
     self.__policy = self.__get_policy()
 
-  """Gets the best action from the observation using the learned policy
-  """
   def get_action(self, observation):
+    """Gets the best action from the observation using the learned policy
+
+    Args:
+        observation (object): Observation from the environment
+
+    Returns:
+        integer: selected action
+    """    
     state = self._environment.get_state(observation)
     return self.__policy[state]
 
-  """Save a serialized version of the model to a file
-  """
   def save(self):
+    """Save a serialized version of the model to a file
+    """    
     self._save_object(self.__q_values, self.__agent_persist_file_path)
 
-  """Loads the serialized version of the model from file
-  """
   def load(self):
+    """Loads the serialized version of the model from file
+    """
     self.__q_values = self._load_object(self.__agent_persist_file_path)
     self.__policy = self.__get_policy()
 
   def __pick_action(self, state):
+    """Picks the next action based on a probability distribution created
+    from the q-values or randomly.
+    The selection would depend on the value of the exploration_rate. (action selection policy: epsilon greedy)
+
+    Args:
+        observation (object): Observation from the environment
+
+    Returns:
+        integer: Picked action
+    """
     return pick_action(
       self.__q_values[state],
       self._environment.get_number_of_actions(),

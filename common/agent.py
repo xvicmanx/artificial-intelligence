@@ -13,9 +13,6 @@ class Agent:
 
   def train(self):
     """Trains the agent
-
-    Raises:
-        Exception: Should be implemented by the class that extend it
     """    
     raise Exception('Method not implemented')
 
@@ -25,24 +22,21 @@ class Agent:
     Args:
         observation (object): Environment observation
 
-    Raises:
-        Exception: Should be implemented by the class that extend it
+    Returns:
+        integer: action
     """    
     raise Exception('Method not implemented')
 
   def save(self):
     """Save a serialized version of the agent to files
-
-    Raises:
-        Exception: Should be implemented by the class that extend it
     """    
     raise Exception('Method not implemented')
 
   def load(self):
     """Loads the serialized version of the agent from files
 
-    Raises:
-        Exception: Should be implemented by the class that extend it
+    Returns:
+        object: unserialized object
     """    
     raise Exception('Method not implemented')
 
