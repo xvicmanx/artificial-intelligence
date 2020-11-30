@@ -50,7 +50,7 @@ class Environment:
 
     Returns:
         integer: Number of actions that can be applied
-    """    
+    """
     raise Exception('Method not implemented')  
 
   def render(self):
