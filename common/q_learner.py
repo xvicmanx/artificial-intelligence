@@ -2,6 +2,10 @@ import numpy as np
 from helpers import pick_action
 from agent import Agent
 
+# Q(s, a) = (1 - learning_rate) * Q(s, a) + learning_rate * Q_new(s, a)
+# Q_new(s, a) = reward(s, a) + discount_factor * max_a' Q(s', a') 
+
+
 class QLearner(Agent):
   min_learning_rate = 0.001
 
@@ -122,10 +126,12 @@ class QLearner(Agent):
     )
 
   def __get_policy(self):
+    """Gets the policy from the Q values table
+
+    Returns:
+        array: The policy learned
+    """    
     return np.argmax(
       self.__q_values,
       axis = len(self._environment.get_states_dimension()),
     )
-
-# Q(s, a) = (1 - learning_rate) * Q(s, a) + learning_rate * Q_new(s, a)
-# Q_new(s, a) = reward(s, a) + discount_factor * max_a' Q(s', a') 
