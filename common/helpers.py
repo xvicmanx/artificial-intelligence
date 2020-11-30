@@ -1,4 +1,5 @@
 import numpy as np
+import gym
 
 
 def make_discrete(observation, space, intervals):
@@ -82,3 +83,17 @@ def show_result(
     
     if done:
       break
+
+def print_gym_environment_details(gym_env_name):
+  """Prints the details of a gym environment
+
+  Args:
+      gym_env_name (string): Name of the gym environment
+  """  
+  env = gym.make(gym_env_name)
+  initial_observation = env.reset()
+
+  print('Environment name', gym_env_name)
+  print('Initial observation', initial_observation)
+  print('Total of actions', env.action_space)
+  print('Observation space', env.observation_space)
