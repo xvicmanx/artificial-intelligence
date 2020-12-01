@@ -19,7 +19,9 @@ class QLearner(Agent):
     discount_factor = 1.0,
     episodes = 100,
     iterations = 10000,
-    exploration_rate = 0.02
+    exploration_rate = 0.5,
+    min_exploration_rate = 0.02,
+    exploration_rate_decay = 0.998,
   ):
     """An agent that learns from the environment using the Deep Q Learning algorithm
 
@@ -45,6 +47,8 @@ class QLearner(Agent):
     self.__episodes = episodes
     self.__iterations = iterations
     self.__exploration_rate = exploration_rate
+    self.__min_exploration_rate = min_exploration_rate
+    self.__exploration_rate_decay = exploration_rate_decay
     self.__q_values = np.zeros(states + (actions, ))
     self.__policy = None
     self.__total_rewards = []
@@ -88,7 +92,16 @@ class QLearner(Agent):
       else:
         max_reward = max(max_reward, total_reward)
       
-      print('Episode ' + str(e + 1), ', Max reward ' + str(max_reward), ', Total reward ' + str(total_reward))
+      self.__exploration_rate = max(
+        self.__min_exploration_rate,
+        self.__exploration_rate * self.__exploration_rate_decay
+      )
+      print(
+        'Episode ' + str(e + 1),
+        ', Max reward ' + str(max_reward),
+        ', Total reward ' + str(total_reward),
+        ', Exploration rate ' + str(self.__exploration_rate), 
+        )
 
 
     self.__policy = self.__get_policy()
