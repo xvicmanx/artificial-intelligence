@@ -1,4 +1,5 @@
 import joblib
+import matplotlib.pyplot as plt
 from helpers import show_result
 
 class Agent:  
@@ -77,3 +78,20 @@ class Agent:
         object: the unserialized object
     """    
     return joblib.load(file_path)
+
+  def _save_reward_plot(self, rewards, file_path):
+    """Generates a plot of total rewards vs episodes and stores it
+    
+    Args:
+        rewards (list): total reward per episode
+        file_path (string): path to store the plot
+    """    
+    plt.plot(
+      range(len(rewards)),
+      rewards,
+    )
+    plt.xlabel('Episode')
+    plt.ylabel('Total reward')
+    plt.title('Total reward per episode')
+    plt.savefig(file_path)
+    plt.clf()

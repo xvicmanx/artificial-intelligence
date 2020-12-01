@@ -9,6 +9,7 @@ class CartPoleQLearningAgent(QLearner):
     super().__init__(
       CartPoleEnvironment(),
       persisted_models_dirname + '/' + 'cart_pole_q_learning_agent.sav',
+      persisted_models_dirname + '/' + 'cart_pole_q_learner_reward_plot.png',
       episodes = 10000,
       iterations = 200,
       exploration_rate = 0.02,

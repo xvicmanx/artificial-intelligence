@@ -2,6 +2,7 @@ import numpy as np
 from helpers import pick_action
 from agent import Agent
 
+
 # Q(s, a) = (1 - learning_rate) * Q(s, a) + learning_rate * Q_new(s, a)
 # Q_new(s, a) = reward(s, a) + discount_factor * max_a' Q(s', a') 
 
@@ -13,6 +14,7 @@ class QLearner(Agent):
     self,
     environment,
     agent_persist_file_path,
+    reward_plot_file_path,
     learning_rate = 1.0,
     discount_factor = 1.0,
     episodes = 100,
@@ -24,6 +26,7 @@ class QLearner(Agent):
     Args:
         environment (Environment): Environment to interacts with
         agent_persist_file_path (string): Path to persist the learned model
+        reward_plot_file_path (string): Path to store the reward plot figure
         learning_rate (float, optional): Learning rate. Defaults to 1.0.
         discount_factor (float, optional): Discount factor. Defaults to 0.5.
         episodes (int, optional): Number of episodes to run. Defaults to 100.
@@ -36,6 +39,7 @@ class QLearner(Agent):
     actions = environment.get_number_of_actions()
 
     self.__agent_persist_file_path = agent_persist_file_path
+    self.__reward_plot_file_path = reward_plot_file_path
     self.__learning_rate = learning_rate
     self.__discount_factor = discount_factor
     self.__episodes = episodes
@@ -43,6 +47,7 @@ class QLearner(Agent):
     self.__exploration_rate = exploration_rate
     self.__q_values = np.zeros(states + (actions, ))
     self.__policy = None
+    self.__total_rewards = []
     
 
   def train(self):
@@ -52,7 +57,7 @@ class QLearner(Agent):
     env = self._environment
     df = self.__discount_factor
     initial_learning_rate = self.__learning_rate
-
+    self.__total_rewards = []
     max_reward = None
     for e in range(self.__episodes):
       state = env.get_initial_state()
@@ -76,12 +81,15 @@ class QLearner(Agent):
         if done:
           break
 
+      self.__total_rewards.append(total_reward)
+
       if max_reward is None:
         max_reward = total_reward
       else:
         max_reward = max(max_reward, total_reward)
       
-      print('Episode ' + str(e + 1), max_reward, total_reward)
+      print('Episode ' + str(e + 1), ', Max reward ' + str(max_reward), ', Total reward ' + str(total_reward))
+
 
     self.__policy = self.__get_policy()
 
@@ -101,6 +109,7 @@ class QLearner(Agent):
     """Save a serialized version of the model to a file
     """    
     self._save_object(self.__q_values, self.__agent_persist_file_path)
+    self._save_reward_plot(self.__total_rewards, self.__reward_plot_file_path)
 
   def load(self):
     """Loads the serialized version of the model from file
@@ -135,3 +144,4 @@ class QLearner(Agent):
       self.__q_values,
       axis = len(self._environment.get_states_dimension()),
     )
+

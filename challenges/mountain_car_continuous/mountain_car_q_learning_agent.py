@@ -9,4 +9,5 @@ class MountainCarQLearningAgent(QLearner):
     super().__init__(
       MountainCarEnvironment(),
       persisted_models_dirname + '/' + 'mountain_car_q_learner.sav'
+      persisted_models_dirname + '/' + 'mountain_car_q_learner_reward_plot.png',
     )
