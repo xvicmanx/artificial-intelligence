@@ -12,4 +12,5 @@ class MountainCarQLearningAgent(QLearner):
       persisted_models_dirname + '/' + 'mountain_car_q_learner_reward_plot.png',
       episodes = 2000,
       iterations = 200,
+      exploration_rate = 0.2
     )
