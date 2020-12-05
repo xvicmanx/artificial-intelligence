@@ -1,5 +1,5 @@
 # Artificial Intelligence
-A project created to explore some of the most important algorithms of Artificial Intelligence by solving some challenges.
+A project created to explore some of the most important algorithms of the area of Artificial Intelligence by solving some challenges with those learned algorithms.
 
 ## Install
 ```
